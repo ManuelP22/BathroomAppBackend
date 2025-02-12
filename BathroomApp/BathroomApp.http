@@ -1,0 +1,6 @@
+@BathroomApp_HostAddress = http://localhost:5250
+
+GET {{BathroomApp_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
