@@ -14,6 +14,8 @@ var builder = WebApplication.CreateBuilder(args);
 // Registra un servicio singleton para almacenar el estado del baño.
 // (La interfaz y la implementación se encuentran en BathroomApp.Service)
 builder.Services.AddSingleton<IBathroomService, BathroomService>();
+builder.Services.AddSingleton<IConfigurationService, ConfigurationService>();
+builder.Services.AddHostedService<BathroomMonitorService>();
 
 // Agrega SignalR para notificaciones en tiempo real.
 builder.Services.AddSignalR();
@@ -23,7 +25,7 @@ builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowAll", policy =>
     {
-        policy.WithOrigins("http://localhost:5173", builder.Configuration.GetValue<string>("BackEndURL") ?? "https://localhost:7131")
+        policy.WithOrigins("http://localhost:5173", builder.Configuration.GetValue<string>("BackEndURL") ?? "https://localhost:7131", "http://localhost:5174")
               .AllowAnyMethod()
               .AllowAnyHeader()
               .AllowCredentials();
@@ -55,7 +57,7 @@ app.UseCors("AllowAll");
 app.UseAuthorization();
 
 // Mapea los controladores.
-app.MapControllers();
+app.MapControllers().RequireCors("AllowAll");
 
 // Mapea el hub de SignalR en la ruta /bathroomHub.
 app.MapHub<BathroomHub>("/bathroomHub");
